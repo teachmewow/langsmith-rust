@@ -1,5 +1,4 @@
 use langsmith_rust::models::run::RunType;
-use langsmith_rust::tracing::tracer::Tracer;
 use langsmith_rust::factories::TracerFactory;
 use serde_json::json;
 use std::env;
@@ -9,8 +8,8 @@ async fn test_tracer_hierarchy() {
     env::set_var("LANGSMITH_TRACING", "false");
     env::set_var("LANGSMITH_API_KEY", "test-key");
     
-    let mut parent = TracerFactory::create_root("Parent".to_string(), RunType::Chain, json!({"input": "test"}));
-    let mut child = parent.create_child("Child".to_string(), RunType::Llm, json!({"messages": []}));
+    let parent = TracerFactory::create_root("Parent".to_string(), RunType::Chain, json!({"input": "test"}));
+    let child = parent.create_child("Child".to_string(), RunType::Llm, json!({"messages": []}));
     let grandchild = child.create_child("Grandchild".to_string(), RunType::Tool, json!({"tool": "test"}));
     
     assert_eq!(child.parent_run_id(), Some(parent.run_id()));

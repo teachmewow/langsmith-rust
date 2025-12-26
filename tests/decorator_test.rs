@@ -1,7 +1,6 @@
 use langsmith_rust::models::run::RunType;
 use langsmith_rust::tracing::decorator::trace_node;
 use langsmith_rust::error::Result;
-use serde_json::json;
 use std::env;
 
 async fn test_function(input: i32) -> Result<i32> {
