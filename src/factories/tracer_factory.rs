@@ -52,12 +52,11 @@ impl TracerFactory {
         inputs: Value,
     ) -> Tracer {
         let mut tracer = Tracer::new(name, run_type, inputs);
-        // Ensure trace_id is set - need to post first to initialize
-        // For now, we'll create a context manually
-        use uuid::Uuid;
-        let trace_id = Uuid::new_v4();
-        let context = TraceContext::new(trace_id);
-        tracer = tracer.with_context(&context);
+        // Initialize trace_id and dotted_order for root run
+        if tracer.run.trace_id.is_none() {
+            tracer.run.trace_id = Some(tracer.run.id);
+            tracer.run.dotted_order = Some(tracer.run.generate_dotted_order(None));
+        }
         tracer
     }
 

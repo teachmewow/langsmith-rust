@@ -18,19 +18,23 @@ fn test_config_from_env() {
     assert_eq!(config.endpoint, "https://test.api.smith.langchain.com");
     assert_eq!(config.api_key, "test-api-key");
     assert_eq!(config.project, Some("test-project".to_string()));
+    
+    // Clean up for next test
+    env::remove_var("LANGSMITH_TRACING");
+    env::remove_var("LANGSMITH_ENDPOINT");
+    env::remove_var("LANGSMITH_PROJECT");
 }
 
 #[test]
 fn test_config_defaults() {
     Config::reset();
-    // Clean all vars first
-    env::remove_var("LANGSMITH_TRACING");
-    env::remove_var("LANGSMITH_ENDPOINT");
-    env::remove_var("LANGSMITH_API_KEY");
-    env::remove_var("LANGSMITH_PROJECT");
-    
-    // Set only required var
+    // Override any .env values by explicitly setting vars
+    // Set only required var - others should use defaults
     env::set_var("LANGSMITH_API_KEY", "test-key");
+    // Explicitly set to default to override .env
+    env::set_var("LANGSMITH_ENDPOINT", "https://api.smith.langchain.com");
+    // Explicitly set tracing to false to override .env
+    env::set_var("LANGSMITH_TRACING", "false");
 
     let config = Config::from_env_no_dotenv();
     assert!(config.is_ok());
@@ -38,6 +42,10 @@ fn test_config_defaults() {
     
     assert_eq!(config.tracing_enabled, false);
     assert_eq!(config.endpoint, "https://api.smith.langchain.com");
+    
+    // Clean up for next test
+    env::remove_var("LANGSMITH_TRACING");
+    env::remove_var("LANGSMITH_ENDPOINT");
 }
 
 #[test]
@@ -86,5 +94,8 @@ fn test_is_tracing_enabled() {
     env::set_var("LANGSMITH_TRACING", "false");
     let config = Config::from_env_no_dotenv().unwrap();
     assert!(!config.tracing_enabled);
+    
+    // Clean up for next test
+    env::remove_var("LANGSMITH_TRACING");
 }
 
