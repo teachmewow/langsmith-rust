@@ -48,14 +48,18 @@ fn test_config_defaults() {
 #[test]
 fn test_config_missing_api_key() {
     Config::reset();
-    // Ensure API key is not set
+    // Ensure API key is not set - remove from environment completely
     env::remove_var("LANGSMITH_API_KEY");
-    // But set other vars to avoid .env file interference
-    env::set_var("LANGSMITH_TRACING", "false");
+    // Remove all other vars too to ensure clean state
+    env::remove_var("LANGSMITH_TRACING");
+    env::remove_var("LANGSMITH_ENDPOINT");
+    env::remove_var("LANGSMITH_PROJECT");
     
+    // from_env_no_dotenv should fail without API key
     let config = Config::from_env_no_dotenv();
-    assert!(config.is_err());
-    assert!(config.unwrap_err().to_string().contains("LANGSMITH_API_KEY"));
+    assert!(config.is_err(), "Expected error when LANGSMITH_API_KEY is missing");
+    let err_msg = config.unwrap_err().to_string();
+    assert!(err_msg.contains("LANGSMITH_API_KEY"), "Error message should mention LANGSMITH_API_KEY: {}", err_msg);
 }
 
 #[test]
