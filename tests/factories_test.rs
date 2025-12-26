@@ -30,6 +30,10 @@ fn test_tracer_factory_create_root() {
     
     assert!(tracer.trace_id().is_some());
     assert!(tracer.dotted_order().is_some());
+    // Verify dotted_order format
+    let dotted = tracer.dotted_order().unwrap();
+    assert!(dotted.contains('Z'));
+    assert!(dotted.len() > 20);
 }
 
 #[test]
