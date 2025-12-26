@@ -2,9 +2,13 @@
 name = "langsmith-rust"
 version = "0.1.0"
 edition = "2021"
-description = "Rust crate for manual tracing to LangSmith"
+description = "Rust crate for manual tracing to LangSmith, providing similar ergonomics to the Python and TypeScript SDKs"
 license = "MIT"
-authors = ["Your Name <you@example.com>"]
+authors = ["teachmewow"]
+repository = "https://github.com/teachmewow/langsmith-rust"
+keywords = ["langsmith", "tracing", "observability", "langchain", "ai"]
+categories = ["development-tools", "web-programming"]
+readme = "README.md"
 
 [dependencies]
 reqwest = { version = "0.11", features = ["json"] }
