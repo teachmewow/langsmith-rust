@@ -4,6 +4,8 @@
 
 This crate implements a modular, extensible architecture for tracing to LangSmith. It follows SOLID principles and uses several design patterns to ensure maintainability and scalability.
 
+This documentation reflects the **current** crate layout and also highlights how a LangGraph-like executor (e.g. TeachMeWowAgent’s Graph DSL) can integrate via `GraphTrace` and `RunScope`.
+
 ## Hierarchical Structure
 
 ```
@@ -26,6 +28,8 @@ langsmith-rust/
 │   │   ├── tracer.rs             # Tracer (main tracing struct)
 │   │   ├── context.rs            # TraceContext (propagation)
 │   │   └── decorator.rs          # trace_node helpers
+│   │   ├── graph.rs              # GraphTrace (LangGraph-like helpers)
+│   │   └── scope.rs              # RunScope (ergonomic run lifecycle)
 │   ├── strategies/               # Strategy pattern implementations
 │   │   ├── mod.rs
 │   │   ├── tracing_strategy.rs   # Tracing strategies (async/sync)
@@ -211,6 +215,37 @@ Root Node (Chain)
             ├─► child.end(outputs)
             │
             └─► child.patch() ──► PATCH /runs/{child_id}
+```
+
+## GraphTrace Flow (LangGraph-like executors)
+
+Many agent runtimes (like TeachMeWowAgent’s Graph DSL) execute a graph as a sequence of node iterations. The recommended integration is:
+
+- Create a single **root run** using `GraphTrace::start_root(...)`.
+- For each node execution, create a **node RunScope** using `start_node_iteration(...)`.
+- Trace nested operations (LLM/tool/decisions) using helper methods.
+- Close the node scope with `end_ok(...)` or `end_error(...)`.
+- Close the root run with `end_root(...)`.
+
+```mermaid
+sequenceDiagram
+participant Exec as GraphExecutor
+participant Trace as GraphTrace
+participant Scope as RunScope
+participant LangSmith as LangSmithAPI
+
+Exec->>Trace: start_root(inputs,thread_id)
+Trace->>LangSmith: POST /runs (root)
+
+loop each_node_iteration
+  Exec->>Trace: start_node_iteration(node,inputs)
+  Trace->>LangSmith: POST /runs (child)
+  Exec->>Scope: end_ok(outputs) OR end_error(err)
+  Scope->>LangSmith: PATCH /runs/{id}
+end
+
+Exec->>Trace: end_root(outputs)
+Trace->>LangSmith: PATCH /runs/{root_id}
 ```
 
 ## Design Patterns

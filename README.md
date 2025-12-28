@@ -20,7 +20,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-langsmith-rust = { path = "../langsmith-rust" }
+langsmith-rust = "0.1.3"
 ```
 
 Or from a git repository:
@@ -165,6 +165,26 @@ impl GraphNode {
 ```
 
 See [INTEGRATION.md](./INTEGRATION.md) for detailed integration guide.
+
+## Integration with Graph DSL (TeachMeWowAgent style)
+
+`GraphTrace` + `RunScope` are designed for LangGraph-like executors where each node iteration is a child run:
+
+```rust
+use langsmith_rust::GraphTrace;
+use serde_json::json;
+
+// Start root run
+let trace = GraphTrace::start_root(json!({"messages": []}), Some("thread-123".to_string())).await?;
+
+// Each node iteration
+let scope = trace.start_node_iteration("chatbot", json!({"messages": []})).await?;
+// ... execute node ...
+scope.end_ok(json!({"messages": []})).await?;
+
+// Close root run
+trace.end_root(json!({"finish_reason": "stop"})).await?;
+```
 
 ## API Reference
 

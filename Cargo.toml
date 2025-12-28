@@ -1,6 +1,6 @@
 [package]
 name = "langsmith-rust"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "Rust crate for manual tracing to LangSmith, providing similar ergonomics to the Python and TypeScript SDKs"
 license = "MIT"
