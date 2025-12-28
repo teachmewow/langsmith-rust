@@ -34,7 +34,7 @@ pub use models::{
 };
 pub use observability::{LangSmithObserver, Observable, ObservableNodeWrapper, Observer};
 pub use strategies::{SerializationStrategy, TracingStrategy};
-pub use tracing::{trace_node, trace_node_sync, TraceContext, Tracer};
+pub use tracing::{trace_node, trace_node_sync, GraphTrace, RunScope, TraceContext, Tracer};
 
 // Initialize dotenv on first use
 pub fn init() {
